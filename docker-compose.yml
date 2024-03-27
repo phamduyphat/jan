@@ -40,68 +40,7 @@ services:
       "
     networks:
       vpcbr:
-
-  # app_cpu service for running the CPU version of the application
-  app_cpu_s3fs:
-    image: jan:latest
-    volumes:
-      - app_data_cpu_s3fs:/app/server/build/jan
-    build:
-      context: .
-      dockerfile: Dockerfile
-    environment:
-      # Set the AWS access key, secret access key, bucket name, endpoint, and region for app_cpu
-      AWS_ACCESS_KEY_ID: minioadmin
-      AWS_SECRET_ACCESS_KEY: minioadmin
-      S3_BUCKET_NAME: mybucket
-      AWS_ENDPOINT: http://10.5.0.2:9000
-      AWS_REGION: us-east-1
-      API_BASE_URL: http://localhost:1337
-    restart: always
-    profiles:
-      - cpu-s3fs
-    ports:
-      - "3000:3000"
-      - "1337:1337"
-      - "3928:3928"
-    networks:
-      vpcbr:
-        ipv4_address: 10.5.0.3
-
-  # app_gpu service for running the GPU version of the application
-  app_gpu_s3fs:
-    deploy:
-      resources:
-        reservations:
-          devices:
-          - driver: nvidia
-            count: all
-            capabilities: [gpu]
-    image: jan-gpu:latest
-    volumes:
-      - app_data_gpu_s3fs:/app/server/build/jan
-    build:
-      context: .
-      dockerfile: Dockerfile.gpu
-    restart: always
-    environment:
-      # Set the AWS access key, secret access key, bucket name, endpoint, and region for app_gpu
-      AWS_ACCESS_KEY_ID: minioadmin
-      AWS_SECRET_ACCESS_KEY: minioadmin
-      S3_BUCKET_NAME: mybucket
-      AWS_ENDPOINT: http://10.5.0.2:9000
-      AWS_REGION: us-east-1
-      API_BASE_URL: http://localhost:1337
-    profiles:
-      - gpu-s3fs
-    ports:
-      - "3000:3000"
-      - "1337:1337"
-      - "3928:3928"
-    networks:
-      vpcbr:
-        ipv4_address: 10.5.0.4
-
+      
   app_cpu_fs:
     image: jan:latest
     volumes:
@@ -110,7 +49,7 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      API_BASE_URL: http://localhost:1337
+      API_BASE_URL: ${API_BASE_URL}
     restart: always
     profiles:
       - cpu-fs
@@ -121,34 +60,6 @@ services:
     networks:
       vpcbr:
         ipv4_address: 10.5.0.5
-
-  # app_gpu service for running the GPU version of the application
-  app_gpu_fs:
-    deploy:
-      resources:
-        reservations:
-          devices:
-          - driver: nvidia
-            count: all
-            capabilities: [gpu]
-    image: jan-gpu:latest
-    volumes:
-      - app_data_gpu_fs:/app/server/build/jan
-    build:
-      context: .
-      dockerfile: Dockerfile.gpu
-    restart: always
-    environment:
-      API_BASE_URL: http://localhost:1337
-    profiles:
-      - gpu-fs
-    ports:
-      - "3000:3000"
-      - "1337:1337"
-      - "3928:3928"
-    networks:
-      vpcbr:
-        ipv4_address: 10.5.0.6
 
 volumes:
   minio_data:
